@@ -154,10 +154,13 @@ table Fact_Sales
 
 	column ManufacturerID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: a438c88b-e0a0-4ee9-b386-0a4e9706521f
 		summarizeBy: none
 		sourceColumn: ManufacturerID
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

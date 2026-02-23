@@ -86,10 +86,13 @@ table D_Date
 
 	column DateID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: c9a9e267-b4c6-4e68-b1a5-0da6b95f1fbc
 		summarizeBy: none
 		sourceColumn: DateID
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 

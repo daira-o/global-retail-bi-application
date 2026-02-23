@@ -45,10 +45,13 @@ table D_Geo
 
 	column GeoID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 9bdd2f80-f6b3-4e98-a6fd-f47effc48f61
 		summarizeBy: none
 		sourceColumn: GeoID
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
