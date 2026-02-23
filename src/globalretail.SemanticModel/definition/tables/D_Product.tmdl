@@ -1,0 +1,104 @@
+table D_Product
+	lineageTag: 13618e5f-6cbc-4be9-8193-7c7c938ad922
+
+	column ProductID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 1ee48dc8-622b-44bd-8604-f94441b559f5
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 402ffc2d-ec7a-4ab8-b6ac-f830ecbb506e
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column ManufacturerID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2a401b93-6971-4d90-b180-06331987c8e6
+		summarizeBy: none
+		sourceColumn: ManufacturerID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Price
+		dataType: double
+		formatString: #,0.00
+		lineageTag: b7254762-7df8-4276-8bbb-f68c7f03f185
+		summarizeBy: none
+		sourceColumn: Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 6f591b86-1d6a-439c-a144-6570f0f9c704
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Type'
+		dataType: string
+		lineageTag: 7e716dbb-5e81-4c39-b7bf-9f4ceb8f8ec8
+		summarizeBy: none
+		sourceColumn: Product Type
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Product Hierarchy'
+		lineageTag: 3c72b9c8-5567-4275-ba74-cadca2379d89
+
+		level Category
+			lineageTag: e7332516-c2fe-4500-ad78-af22fc2a84ee
+			column: Category
+
+		level 'Product Type'
+			lineageTag: 35a2b88a-45ce-432f-b191-22efa10d7ee0
+			column: 'Product Type'
+
+		level Product
+			lineageTag: e0502862-6fc8-4f58-b540-eb5fe3528625
+			column: Product
+
+	partition D_Product = m
+		mode: import
+		queryGroup: 'Star Schema '
+		source = ```
+				let
+				    Source = MasterSource, 
+				    product_Sheet = Source{[Item="product",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(product_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type0" = Table.TransformColumnTypes(#"Promoted Headers",{{"Product Details", type any}, {"Column2", type text}, {"Column3", type text}, {"Column4", type any}, {"Column5", type text}}),
+				    #"Promoted Headers1" = Table.PromoteHeaders(#"Changed Type0", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers1",{{"ProductID", Int64.Type}, {"Product", type text}, {"Category", type text}, {"ManufacturerID", Int64.Type}, {"Price", type text}}),
+				    #"Duplicated Column" = Table.DuplicateColumn(#"Changed Type1", "Product", "Product - Copy"),
+				    #"Extracted Product Type" = Table.TransformColumns(#"Duplicated Column", {{"Product - Copy", each Text.AfterDelimiter(_, "|"), type text}}),
+				    #"Renamed Product Type" = Table.RenameColumns(#"Extracted Product Type",{{"Product - Copy", "Product Type"}}),
+				    #"Filled Down" = Table.FillDown(#"Renamed Product Type", {"Category"}),
+				    #"Removing Manufacturer from Product Name" = Table.TransformColumns(#"Filled Down", {{"Product", each Text.AfterDelimiter(_, " "), type text}}),
+				    #"Deleting USD" = Table.TransformColumns(#"Removing Manufacturer from Product Name", {{"Price", each Text.AfterDelimiter(_, " "), type text}}),
+				    #"Replace , for ." = Table.ReplaceValue(#"Deleting USD", ".", ",", Replacer.ReplaceText, {"Price"}),
+				    #"Change Price to Decimal Number" = Table.TransformColumnTypes(#"Replace , for .", {{"Price", type number}}),
+				    #"Extracted Product Name" = Table.TransformColumns(#"Change Price to Decimal Number", {{"Product", each Text.BeforeDelimiter(_, "|"), type text}}),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Extracted Product Name",{"ProductID", "Category", "Product", "Product Type", "ManufacturerID", "Price"})
+				in
+				    #"Reordered Columns"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

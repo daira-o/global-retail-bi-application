@@ -1,0 +1,258 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "146510f406e8e5fd9f2d",
+  "position": {
+    "x": 383.72201955969393,
+    "y": 496.51303743027069,
+    "z": 2000,
+    "height": 208.14012576116733,
+    "width": 377.90804956636526,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Geo"
+                        }
+                      },
+                      "Hierarchy": "Geographical Hierarchy"
+                    }
+                  },
+                  "Level": "Country"
+                }
+              },
+              "queryRef": "D_Geo.Geographical Hierarchy.Country",
+              "nativeQueryRef": "Geographical Hierarchy Country",
+              "active": true
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Geo"
+                        }
+                      },
+                      "Hierarchy": "Geographical Hierarchy"
+                    }
+                  },
+                  "Level": "State"
+                }
+              },
+              "queryRef": "D_Geo.Geographical Hierarchy.State",
+              "nativeQueryRef": "Geographical Hierarchy State",
+              "active": false
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Geo"
+                        }
+                      },
+                      "Hierarchy": "Geographical Hierarchy"
+                    }
+                  },
+                  "Level": "City"
+                }
+              },
+              "queryRef": "D_Geo.Geographical Hierarchy.City",
+              "nativeQueryRef": "Geographical Hierarchy City",
+              "active": false
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Geo"
+                        }
+                      },
+                      "Hierarchy": "Geographical Hierarchy"
+                    }
+                  },
+                  "Level": "Zip"
+                }
+              },
+              "queryRef": "D_Geo.Geographical Hierarchy.Zip",
+              "nativeQueryRef": "Geographical Hierarchy Zip",
+              "active": false
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Fact_Sales"
+                        }
+                      },
+                      "Property": "Sold Units"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(Fact_Sales.Sold Units)",
+              "nativeQueryRef": "Sum of Sold Units",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fact_Sales"
+                    }
+                  },
+                  "Property": "Revenue Opportunity Gap %"
+                }
+              },
+              "queryRef": "Fact_Sales.Revenue Opportunity Gap %",
+              "nativeQueryRef": "Revenue Opportunity Gap %"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "categoryAxis": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "logAxisScale": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "invertAxis": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Revenue Efficiency Analysis: Opportunity Gap % vs. Sales Volume'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,147 @@
+table D_Date
+	lineageTag: 3ea9d1ad-de14-4d51-b8d2-6df4190d2a15
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: mmmm "de" yyyy
+		lineageTag: a5543d23-f0fc-4375-9e36-97eb7e7ad7a6
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 4ed3d2d5-d0e4-4d88-8f6d-07cc5eee80dc
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: 91938195-3b62-4f35-952a-8e6c40f172bb
+		summarizeBy: none
+		sourceColumn: Month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: bcd1d167-6d6f-4f21-af5b-8bac36a4fb98
+		summarizeBy: none
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 8defe579-021f-4662-9d94-416d6c6e8e0b
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 8005b9e5-693c-4126-9be7-751161124efb
+		summarizeBy: none
+		sourceColumn: Month Name
+		sortByColumn: Month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 92f77c3c-82ae-47af-80af-7723dab80983
+		summarizeBy: none
+		sourceColumn: Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Name'
+		dataType: string
+		lineageTag: bdf1b69d-91b0-4f96-9f3d-1de4409e8d84
+		summarizeBy: none
+		sourceColumn: Day Name
+		sortByColumn: 'Day of Week'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateID
+		dataType: int64
+		formatString: 0
+		lineageTag: c9a9e267-b4c6-4e68-b1a5-0da6b95f1fbc
+		summarizeBy: none
+		sourceColumn: DateID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Year' = FORMAT('D_Date'[Date], "MMMM YYYY")
+		lineageTag: 72d7f215-024b-4c48-99bc-4c726ee7b7ea
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Date Hierarchy'
+		lineageTag: 984693de-7893-448a-9d7f-1a424205851a
+
+		level Year
+			lineageTag: f4c9e8ee-46b6-4f9e-b097-b25730c9d476
+			column: Year
+
+		level Quarter
+			lineageTag: d35d33c7-52b5-4acc-994c-0a2e658341b9
+			column: Quarter
+
+		level 'Month Name'
+			lineageTag: d44a39c5-d26e-4b54-b3b7-91389cfce30e
+			column: 'Month Name'
+
+	partition D_Date = m
+		mode: import
+		queryGroup: 'Star Schema '
+		source =
+				let
+				    StartDate = #date(2014, 1, 1),
+				    EndDate = #date(2017, 12, 31),
+				    DayCount = Duration.Days(EndDate - StartDate) + 1,
+				    DatesList = List.Dates(StartDate, DayCount, #duration(1,0,0,0)),
+				
+				    DateTable = Table.FromList(DatesList, Splitter.SplitByNothing(), {"Date"}, null, ExtraValues.Error),
+				    #"Changed Type" = Table.TransformColumnTypes(DateTable, {{"Date", type date}}),
+				
+				    #"Year" = Table.AddColumn(#"Changed Type", "Year", each Date.Year([Date]), Int64.Type),
+				    #"Month" = Table.AddColumn(#"Year", "Month", each Date.Month([Date]), Int64.Type),
+				    #"Day" = Table.AddColumn(#"Month", "Day", each Date.Day([Date]), Int64.Type),
+				
+				    #"Quarter" = Table.AddColumn(#"Day", "Quarter", each "Q" & Number.ToText(Date.QuarterOfYear([Date])), type text),
+				
+				    #"Month Name" = Table.AddColumn(#"Quarter", "Month Name", each Date.ToText([Date], "MMMM", "en-US"), type text),
+				    #"Day of Week" = Table.AddColumn(#"Month Name", "Day of Week", each Date.DayOfWeek([Date])+1, Int64.Type),
+				    #"Day Name" = Table.AddColumn(#"Day of Week", "Day Name", each Date.ToText([Date], "dddd", "en-US"), type text),
+				    #"Added Index" = Table.AddIndexColumn(#"Day Name", "Index", 0, 1, Int64.Type),
+				    #"Renamed Columns" = Table.RenameColumns(#"Added Index",{{"Index", "DateID"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,51 @@
+table D_Manufacturer
+	lineageTag: 4a7ce19d-8d9c-42c8-9aa1-277a1e77178a
+
+	column ManufacturerID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6f4d0ddc-c731-4b58-9dac-aed54e82e9ee
+		summarizeBy: none
+		sourceColumn: ManufacturerID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Manufacturer
+		dataType: string
+		lineageTag: ef8dc88b-a66a-41df-9d56-dae451f75f8f
+		summarizeBy: none
+		sourceColumn: Manufacturer
+
+		annotation SummarizationSetBy = Automatic
+
+	column Logo
+		dataType: string
+		lineageTag: 656ae333-d59f-420f-86da-cb7dd9a42f11
+		summarizeBy: none
+		sourceColumn: Logo
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Manufacturer = m
+		mode: import
+		queryGroup: 'Star Schema '
+		source =
+				let
+				    Source = MasterSource,
+				    manufacturer_Sheet = Source{[Item="manufacturer",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(manufacturer_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Column1", type text}, {"Column2", type any}, {"Column3", type any}, {"Column4", type any}, {"Column5", type any}, {"Column6", type any}, {"Column7", type any}, {"Column8", type any}, {"Column9", type any}, {"Column10", type any}, {"Column11", type any}, {"Column12", type any}, {"Column13", type any}, {"Column14", type any}, {"Column15", type any}}),
+				    #"Transposed Table" = Table.Transpose(#"Changed Type"),
+				    #"Promoted Headers1" = Table.PromoteHeaders(#"Transposed Table", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers1",{{"ManufacturerID", Int64.Type}, {"Manufacturer", type text}, {"Logo", type text}, {"Column4", type any}, {"Column5", type any}, {"List of Suppliers and Manufacturers ", type any}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type1",{"List of Suppliers and Manufacturers ", "Column5", "Column4"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

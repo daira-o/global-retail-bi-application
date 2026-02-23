@@ -1,0 +1,17 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.2.0/schema.json",
+  "name": "cacda845c40ed8c9eb89",
+  "position": {
+    "x": 7.7316101282634042,
+    "y": 309.99771118588109,
+    "z": 7000,
+    "height": 398.84100296167009,
+    "width": 1250.3156306978276,
+    "tabOrder": 7000
+  },
+  "visualGroup": {
+    "displayName": "HUB",
+    "groupMode": "ScaleMode"
+  },
+  "isHidden": true
+}

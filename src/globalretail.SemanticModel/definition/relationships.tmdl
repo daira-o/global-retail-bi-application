@@ -1,0 +1,16 @@
+relationship AutoDetected_5b5b95a9-c4f8-447f-bee6-099d5b6067ed
+	fromColumn: Fact_Sales.ProductID
+	toColumn: D_Product.ProductID
+
+relationship AutoDetected_4b71e322-4b0d-4c94-9125-2c7326fd97da
+	fromColumn: Fact_Sales.GeoID
+	toColumn: D_Geo.GeoID
+
+relationship AutoDetected_761f9cab-0d98-4502-b3e8-938a93145ea7
+	fromColumn: Fact_Sales.ManufacturerID
+	toColumn: D_Manufacturer.ManufacturerID
+
+relationship AutoDetected_15949461-279c-44a2-9bae-47698c7bc129
+	fromColumn: Fact_Sales.DateID
+	toColumn: D_Date.DateID
+

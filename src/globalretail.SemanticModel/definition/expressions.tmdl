@@ -1,0 +1,79 @@
+expression USA_14-17 =
+		let
+		    Source = Csv.Document(File.Contents("G:\My Drive\Universidad\Cursada 2025\2do Cuatrimestre\Business Ap\Final Proyect\WS2526 Seminar task data\USSales\sales_14-17.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Replaced . for ," = Table.ReplaceValue(#"Promoted Headers",".",",",Replacer.ReplaceText,{"Revenue"}),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Replaced . for ,",{{"ProductID", Int64.Type}, {"Date", type date}, {"Zip", type text}, {"Units", Int64.Type}, {"Revenue", type number}}),
+		    #"Added Custom" = Table.AddColumn(#"Changed Type", "Country", each "USA"),
+		    #"Renamed Columns" = Table.RenameColumns(#"Added Custom",{{"Date", "SalesDate"}}),
+		    #"Rounded Off" = Table.TransformColumns(#"Renamed Columns",{{"Revenue", each Number.Round(_, 2), type number}}),
+		    #"Cleaned Text" = Table.TransformColumns(#"Rounded Off",{{"Zip", Text.Clean, type text}}),
+		    #"Trimmed Text" = Table.TransformColumns(#"Cleaned Text",{{"Zip", Text.Trim, type text}})
+		in
+		    #"Trimmed Text"
+	lineageTag: fb267ea3-7251-4b1a-9df3-a7c611f004f5
+	queryGroup: 'Transactional Data'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression Germany_14-17 =
+		let
+		    Source = Csv.Document(File.Contents("G:\My Drive\Universidad\Cursada 2025\2do Cuatrimestre\Business Ap\Final Proyect\WS2526 Seminar task data\InternationalSales\Germany_14-17.csv"),[Delimiter=",", Columns=6, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		
+		    #"Renamed Columns" = Table.RenameColumns(#"Promoted Headers",{{"Anzahl", "Units"}, {"Umsatz", "Revenue"}, {"Land", "Country"}, {"Date", "SalesDate"}}),
+		
+		    #"Replaced . for ," = Table.ReplaceValue(#"Renamed Columns",".",",",Replacer.ReplaceText,{"Revenue"}),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Replaced . for ,",{{"ProductID", Int64.Type}, {"SalesDate", type date}, {"Zip", type text}, {"Units", Int64.Type}, {"Revenue", type number}, {"Country", type text}}),
+		    #"Rounded Off" = Table.TransformColumns(#"Changed Type",{{"Revenue", each Number.Round(_, 2), type number}}),
+		    #"Trimmed Text" = Table.TransformColumns(#"Rounded Off",{{"Zip", Text.Trim, type text}}),
+		    #"Cleaned Text" = Table.TransformColumns(#"Trimmed Text",{{"Zip", Text.Clean, type text}})
+		in
+		    #"Cleaned Text"
+	lineageTag: 52486ea6-e839-4257-a5ca-1baf3ae877c8
+	queryGroup: 'Transactional Data'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression Japan_14-17 = ```
+		let
+		    Source = Csv.Document(File.Contents("G:\My Drive\Universidad\Cursada 2025\2do Cuatrimestre\Business Ap\Final Proyect\WS2526 Seminar task data\InternationalSales\Japan_14-17.csv"),[Delimiter=",", Columns=6, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Renamed Columns" = Table.RenameColumns(#"Promoted Headers",{{"CityZip", "Zip"}}),
+		    #"Replaced . for ," = Table.ReplaceValue(#"Renamed Columns",".",",",Replacer.ReplaceText,{"Revenue"}),
+		 
+		    #"Changed Type" = Table.TransformColumnTypes(#"Replaced . for ,",{{"ProductID", Int64.Type}, {"SalesDate", type date}, {"Zip", type text}, {"Units", Int64.Type}, {"Revenue", type number}, {"Country", type text}}),
+		    #"Rounded Off" = Table.TransformColumns(#"Changed Type",{{"Revenue", each Number.Round(_, 2), type number}}),
+		    #"Trimmed Text" = Table.TransformColumns(#"Rounded Off",{{"Zip", Text.Trim, type text}}),
+		    #"Cleaned Zip" = Table.TransformColumns(#"Trimmed Text",{{"Zip", Text.Clean, type text}}),
+		    
+		    #"Filtered Zip Characters" = Table.TransformColumns(#"Cleaned Zip", {{"Zip", each Text.Select(_, {"0".."9", "-"}), type text}})
+		in
+		    #"Filtered Zip Characters"
+		```
+	lineageTag: a20f89e4-faa8-4f0f-a2fb-fdb1c9a7a83e
+	queryGroup: 'Transactional Data'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression MasterSource =
+		let
+		    Source = let
+		    Source = Excel.Workbook(File.Contents("G:\My Drive\Universidad\Cursada 2025\2do Cuatrimestre\Business Ap\Final Proyect\WS2526 Seminar task data\USSales\master data.xlsx"), null, true)
+		in
+		    Source
+		in
+		    Source
+	lineageTag: 69d3ac2c-d192-434d-8e54-a4aea5313fd7
+	queryGroup: 'Star Schema '
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

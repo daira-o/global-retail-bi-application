@@ -1,0 +1,233 @@
+table Fact_Sales
+	lineageTag: 156dd403-3183-4a4c-b46d-382574228747
+
+	measure 'Possible Revenue' =
+			
+			SUMX(
+			    Fact_Sales,
+			    Fact_Sales[Sold Units] * RELATED(D_Product[Price])
+			)
+		formatString: #,0
+		lineageTag: c4b6026a-435b-411c-9d56-d473f77723c1
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Realized Revenue' = SUM(Fact_Sales[Revenue])
+		formatString: \$\ #,0;-\$\ #,0;\$\ #,0
+		lineageTag: 665fb7e9-3855-4f48-9425-05cec8c14273
+
+		annotation PBI_FormatHint = {"currencyCulture":"es-AR"}
+
+	measure 'Revenue YoY' = ```
+			
+			VAR __CURRENT_REVENUE = [Realized Revenue]
+			VAR __PREV_YEAR =
+			    CALCULATE(
+			        [Realized Revenue],
+			        DATEADD(D_Date[Date], -1, YEAR)
+			    )
+			RETURN
+			    IF(
+			        ISBLANK(__CURRENT_REVENUE) || __CURRENT_REVENUE = 0,
+			        BLANK(), 
+			        __CURRENT_REVENUE - __PREV_YEAR
+			    )
+			```
+		formatString: #,0
+		lineageTag: 2d0667ae-4a7e-4ffe-81d9-f0b63315c3b5
+
+	measure 'Revenue Opportunity Gap %' = ```
+			
+			VAR Realized = [Realized Revenue]
+			VAR Possible = [Possible Revenue]
+			VAR Gap = Possible - Realized
+			RETURN
+			IF(
+			    Possible = 0, 
+			    0, 
+			    DIVIDE(Gap, Possible, 0)
+			)
+			
+			```
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 43d3c9fd-65c0-4643-b795-9e1fc79028c4
+
+	measure 'Revenue YoY%' =
+			
+			VAR _Current = [Realized Revenue]
+			VAR _Previous = CALCULATE([Realized Revenue], DATEADD('D_Date'[Date], -1, YEAR))
+			RETURN
+			IF(ISBLANK(_Current) || _Current <= 0, BLANK(), DIVIDE(_Current - _Previous, _Previous))
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: b64605a6-3dc8-4460-b862-630c78fe701e
+
+	measure 'Revenue YTD' =
+			
+			TOTALYTD([Realized Revenue], 'D_Date'[Date])
+		formatString: #,0
+		lineageTag: 67c875e0-8430-4100-8dbe-0f141a3b5311
+
+	measure 'Revenue YoY YTD' = [Revenue YTD]-[Revenue PY YTD]
+		formatString: #,0
+		lineageTag: ffc67290-e2c0-407d-b543-f9f0e0ad20db
+
+	measure 'Revenue PY YTD' = ```
+			
+			VAR _CurrentRevenue = [Realized Revenue]
+			VAR _PreviousYTD = 
+			    CALCULATE(
+			        [Realized Revenue], 
+			        DATESYTD(SAMEPERIODLASTYEAR('D_Date'[Date]))
+			    )
+			RETURN
+			IF(
+			    ISBLANK(_CurrentRevenue) || _CurrentRevenue = 0,
+			    BLANK(), 
+			    _PreviousYTD
+			)
+			```
+		formatString: #,0
+		lineageTag: 7a76d36c-f15b-43ea-a965-48db4fde9187
+
+	measure 'Revenue YoY YTD direct' = ```
+			CALCULATE([Realized Revenue], DATESYTD('D_Date'[Date])) - CALCULATE([Realized Revenue], DATESYTD(SAMEPERIODLASTYEAR('D_Date'[Date])))
+			
+			```
+		formatString: #,0
+		lineageTag: 55030eff-6ea1-48c0-9db3-9caeeb0ba863
+
+	measure 'Revenue YoY YTD%' =
+			
+			DIVIDE([Revenue YTD] - [Revenue PY YTD], [Revenue PY YTD])
+		formatString: 0.0\ %;-0.0\ %;0.0\ %
+		lineageTag: 360f408a-7b7d-4b4e-9ca2-d40dbdbcb69b
+
+	measure 'Opportunity Gap Target' = CALCULATE(0.10,ALLSELECTED())
+		formatString: 0\ %;-0\ %;0\ %
+		lineageTag: 2a39f004-49ac-4086-b8c2-7eb117df2ba7
+
+	measure 'Revenue PY' = ```
+			
+			    CALCULATE(
+			        [Realized Revenue], 
+			        SAMEPERIODLASTYEAR('D_Date'[Date]) 
+			    )
+			```
+		formatString: #,0
+		lineageTag: 12a7527f-2060-41ef-b70e-8001b28bfba1
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Revenue Opportunity Gap' = [Possible Revenue] - [Realized Revenue]
+		formatString: #,0
+		lineageTag: 02e9947f-3b2a-477f-b7b1-0d92aef9fc12
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	column ProductID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ea787e2f-ec82-4c5d-af9f-1c15646e836c
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: decimal
+		isHidden
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 425932f2-8f89-42c9-b3fb-07f811630989
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column ManufacturerID
+		dataType: int64
+		formatString: 0
+		lineageTag: a438c88b-e0a0-4ee9-b386-0a4e9706521f
+		summarizeBy: none
+		sourceColumn: ManufacturerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 83e6bea8-cd32-4e84-9ba1-d62b6dc0131f
+		summarizeBy: none
+		sourceColumn: GeoID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4808310c-4579-4a55-9adc-24ea7af33c44
+		summarizeBy: none
+		sourceColumn: DateID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sold Units'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8dd6075e-196d-4b29-be4a-734c445f8122
+		summarizeBy: sum
+		sourceColumn: Sold Units
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Sales = m
+		mode: import
+		queryGroup: 'Star Schema '
+		source = ```
+				let
+				    Source = Table.Combine({#"USA_14-17", #"Germany_14-17", #"Japan_14-17"}),
+				    #"Removed Columns" = Table.RemoveColumns(Source,{"Country"}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{
+				        {"Zip", type text}, 
+				        {"Units", Int64.Type}, 
+				        {"Revenue", Currency.Type},
+				        {"SalesDate", type date}
+				    }),
+				    #"Cleaned Zip" = Table.TransformColumns(#"Changed Type", {{"Zip", each Text.Select(Text.Trim(Text.Clean(_)), {"0".."9", "-"}), type text}}),
+				    #"Merged Product" = Table.NestedJoin(#"Cleaned Zip", {"ProductID"}, D_Product, {"ProductID"}, "prod", JoinKind.LeftOuter),
+				    #"Expanded Product" = Table.ExpandTableColumn(#"Merged Product", "prod", {"ManufacturerID"}, {"ManufacturerID"}),
+				    #"Merged Geo" = Table.NestedJoin(#"Expanded Product", {"Zip"}, D_Geo, {"Zip"}, "geo", JoinKind.LeftOuter),
+				    #"Expanded Geo" = Table.ExpandTableColumn(#"Merged Geo", "geo", {"GeoID"}, {"GeoID"}),
+				    #"Merged Date" = Table.NestedJoin(#"Expanded Geo", {"SalesDate"}, D_Date, {"Date"}, "date", JoinKind.LeftOuter),
+				    #"Expanded Date" = Table.ExpandTableColumn(#"Merged Date", "date", {"DateID"}, {"DateID"}),
+				    #"Removed Columns1" = Table.RemoveColumns(#"Expanded Date",{"SalesDate"}),
+				    #"Final Types" = Table.TransformColumnTypes(#"Removed Columns1",{
+				        {"DateID", Int64.Type},
+				        {"ManufacturerID", Int64.Type},
+				        {"GeoID", Int64.Type},
+				        {"Units", Int64.Type}
+				    }),
+				    #"Renamed Columns" = Table.RenameColumns(#"Final Types",{{"Units", "Sold Units"}}),
+				    #"Removed Columns2" = Table.RemoveColumns(#"Renamed Columns",{"Zip"})
+				in
+				    #"Removed Columns2"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

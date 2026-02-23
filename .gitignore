@@ -1,0 +1,18 @@
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+# --- DATA PRIVACY ---
+
+*.csv
+*.xls
+*.xlsx
+*.zip
+
+# --- POWER BI TEMPORARY & LOCAL FILES ---
+
+**/localSettings.json
+**/User.zip
+**/item.config.json
+**/item.metadata.json
+**/.Data/
+*.pbi
+*.tmp

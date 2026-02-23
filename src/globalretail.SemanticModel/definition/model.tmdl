@@ -1,0 +1,30 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-AR
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup 'Transactional Data'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup 'Star Schema '
+
+	annotation PBI_QueryGroupOrder = 1
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["Fact_Sales","D_Geo","D_Manufacturer","D_Product","USA_14-17","Germany_14-17","Japan_14-17","D_Date","MasterSource"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table D_Geo
+ref table D_Manufacturer
+ref table D_Product
+ref table Fact_Sales
+ref table D_Date
+
+ref cultureInfo en-US
+

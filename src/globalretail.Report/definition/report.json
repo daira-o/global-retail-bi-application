@@ -1,0 +1,111 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.0.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY24SU10",
+      "reportVersionAtImport": {
+        "visual": "1.8.95",
+        "report": "2.0.95",
+        "page": "1.3.95"
+      },
+      "type": "SharedResources"
+    },
+    "customTheme": {
+      "name": "AccessibleDefault",
+      "reportVersionAtImport": {
+        "visual": "2.1.0",
+        "report": "2.1.0",
+        "page": "2.0.0"
+      },
+      "type": "SharedResources"
+    }
+  },
+  "filterConfig": {
+    "filterSortOrder": "Custom"
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "PulseChart1459209850231",
+    "ChordChart1444757060245",
+    "RadarChart1446119667547",
+    "BasedOnTimelineSlicer",
+    "histogramF963F133BA02A0B35D286F09F80E9C78",
+    "sparklines50DB3783432B40A69C0B91926CE74CD9",
+    "lollipopChart50393786178B4137A75F3257CB590B96",
+    "PBI_CV_7B952816_A48F_49B4_9E13_15E3BB2C0337",
+    "payPalKPIDonutChart55A431AB15A540ED924ACD72ED8D259F",
+    "Tachometer1474636471549",
+    "powerKPI462CE5C2666F4EC8A8BDD7E5587320A3",
+    "Multi_target_KPI",
+    "ZebraBITablesBAE31B370F254F808553548EFB35BFA5"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY24SU10",
+          "path": "BaseThemes/CY24SU10.json",
+          "type": "BaseTheme"
+        },
+        {
+          "name": "AccessibleDefault",
+          "path": "BuiltInThemes/AccessibleDefault.json",
+          "type": "CustomTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "photo-1486072889922-9aea1fc0a39615154158064694.jpg",
+          "path": "photo-1486072889922-9aea1fc0a39615154158064694.jpg",
+          "type": "Image"
+        },
+        {
+          "name": "photo-1486072889922-9aea1fc0a35880733518772677.jpg",
+          "path": "photo-1486072889922-9aea1fc0a35880733518772677.jpg",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  }
+}

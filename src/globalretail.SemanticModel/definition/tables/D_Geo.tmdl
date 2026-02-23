@@ -1,0 +1,115 @@
+table D_Geo
+	lineageTag: e10c7905-0292-441e-ab6d-f9fe1c1a055a
+
+	column Zip
+		dataType: string
+		lineageTag: 88519269-cbd4-4f03-92be-eff97afb6f6b
+		dataCategory: PostalCode
+		summarizeBy: none
+		sourceColumn: Zip
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 2e2fefab-c6b9-40f2-889e-a9bfe5a8f6be
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 127da472-44ed-437e-b689-6d786f326aaa
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Full Address' = D_Geo[City] & ", " & D_Geo[State] & ", " & D_Geo[Country]
+		lineageTag: 0daf8f5c-b805-4ba0-9925-c60340624e70
+		dataCategory: Address
+		summarizeBy: none
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column GeoID
+		dataType: int64
+		formatString: 0
+		lineageTag: 9bdd2f80-f6b3-4e98-a6fd-f47effc48f61
+		summarizeBy: none
+		sourceColumn: GeoID
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 230c074d-26cc-4250-bc8f-689663ac5ebe
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Geographical Hierarchy'
+		lineageTag: c8793577-b83b-4a0d-b942-534313c949f3
+
+		level Country
+			lineageTag: 44227ba5-24d6-4866-972f-31056c9e21fb
+			column: Country
+
+		level State
+			lineageTag: 85d760d8-bd62-45c1-b309-233a80a5b882
+			column: State
+
+		level City
+			lineageTag: 200189c0-e142-4b66-b02e-8e42a9c95c91
+			column: City
+
+		level Zip
+			lineageTag: 6197a602-539c-413a-a323-2d1c9d0a64f6
+			column: Zip
+
+	partition D_Geo = m
+		mode: import
+		queryGroup: 'Star Schema '
+		source = ```
+				let
+				    Source = MasterSource, 
+				    geo_Sheet = Source{[Item="geo",Kind="Sheet"]}[Data],
+				    #"Removed Top Rows" = Table.Skip(geo_Sheet,3),
+				    #"Promoted Headers1" = Table.PromoteHeaders(#"Removed Top Rows", [PromoteAllScalars=true]),
+				    #"Filtered Empty Rows" = Table.SelectRows(#"Promoted Headers1", each ([Country] <> null) and ([City] <> null or [Zip] <> null)),
+				    #"Filtered Countries" = Table.SelectRows(#"Filtered Empty Rows", each [Country] = "Germany" or [Country] = "Japan" or [Country] = "USA"),
+				    #"Clean Admin" = Table.ReplaceValue(#"Filtered Countries", each [City], each Text.Replace(Text.Replace(Text.Replace(Text.Replace([City], "Kreisfreie Stadt ", ""), "Landkreis ", ""), "Altmarkkreis ", ""), "Mittlerer ", ""), Replacer.ReplaceText, {"City"}),
+				    #"Unify Cities" = Table.ReplaceValue(#"Clean Admin", each [City], each if Text.Contains([City], "Halle") then "Halle" else if Text.Contains([City], "Mansfeld") then "Mansfeld" else if Text.Contains([City], "Weimar") then "Weimar" else if Text.Contains([City], "Offenbach") then "Offenbach" else if Text.Contains([City], "Bitterfeld") then "Bitterfeld" else if Text.Contains([City], "Saale-") then Text.BeforeDelimiter([City], "-") else if Text.EndsWith([City], "kreis") then Text.BeforeDelimiter([City], "kreis") else if Text.EndsWith([City], " Land") then Text.BeforeDelimiter([City], " Land") else [City], Replacer.ReplaceText, {"City"}),
+				    #"Final City Cleanup" = Table.ReplaceValue(#"Unify Cities", " Stadt", "", Replacer.ReplaceText, {"City"}),
+				    #"Cleaned USA City" = Table.TransformColumns(#"Final City Cleanup", {{"City", each Text.BeforeDelimiter(_, ","), type text}}),
+				    #"Unified City" = Table.AddColumn(#"Cleaned USA City", "City_Final", each if [Country] = "Japan" then [District] else [City], type text),
+				    #"Cleaned Zip" = Table.TransformColumns(#"Unified City", {{"Zip", each Text.Select(_, {"0".."9", "-"}), type text}}),
+				    #"Standardized State" = Table.ReplaceValue(#"Cleaned Zip","Toukyouto","Tokyo",Replacer.ReplaceText,{"State"}),
+				    #"Removed Old" = Table.RemoveColumns(#"Standardized State",{"City", "District", "Region"}),
+				    #"Renamed" = Table.RenameColumns(#"Removed Old",{{"City_Final", "City"}}),
+				    #"Added GeoID" = Table.AddIndexColumn(#"Renamed", "GeoID", 1, 1, Int64.Type),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Added GeoID",{"GeoID", "Zip", "State", "Country", "City"}),
+				    #"Filtered blank States" = Table.SelectRows(#"Reordered Columns", each ([State] <> null and [State] <> ""))
+				in
+				    #"Filtered blank States"
+				```
+
+	changedProperty = IsHidden
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
