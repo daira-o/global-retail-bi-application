@@ -58,7 +58,7 @@ The sales page compares performance by country, manufacturer, product type and c
 
 It also shows the relationship between revenue and sales volume over time.
 
-![Sales Analysis](images/sales.png)
+![Sales Analysis](images/Sales.png)
 
 ### Geographic Analysis
 
@@ -66,7 +66,7 @@ The geographic page allows users to explore sales by location and identify geogr
 
 The decomposition tree provides additional analysis by manufacturer, category and product.
 
-![Geographic Analysis](images/geography.png)
+![Geographic Analysis](images/Geography.png)
 
 ---
 
